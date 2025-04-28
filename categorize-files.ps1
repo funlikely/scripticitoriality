@@ -14,7 +14,10 @@ try {
 # Get all files in the given folder
 $files = Get-ChildItem -Path $resolvedPath -File
 
-foreach ($file in $files) {
+# Sort files by name length (shortest first)
+$sortedFiles = $files | Sort-Object { $_.Name.Length }
+
+foreach ($file in $sortedFiles) {
     # Match files ending with _YYYY-MM-DD_HH-MM-SS.mp4
     if ($file.Name -match "^(.*)_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.mp4$") {
         $baseName = $matches[1]
