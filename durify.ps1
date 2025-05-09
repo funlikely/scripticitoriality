@@ -11,7 +11,17 @@ if (-not (Test-Path $File)) {
     exit 1
 }
 
-$command = "exiftool -overwrite_original `"-FileModifyDate=$Time`" `"-FileAccessDate=$Time`" `"-FileCreateDate=$Time`" `"$File`""
+function Show-ExifDates {
+    param ([string]$Path)
+    exiftool -FileModifyDate -FileCreateDate "$Path"
+}
 
-Write-Host "Running command: $command"
+Write-Host "`n--- Before ---" -ForegroundColor Yellow -BackgroundColor Black
+Show-ExifDates -Path $File
+$command = "exiftool -overwrite_original `"-FileModifyDate=$Time`" `"-FileCreateDate=$Time`" `"$File`""
+
+Write-Host "Running command: $command" -ForegroundColor Cyan -BackgroundColor DarkGreen
 Invoke-Expression $command
+
+Write-Host "`n--- After ---" -ForegroundColor Yellow -BackgroundColor Black
+Show-ExifDates -Path $File
