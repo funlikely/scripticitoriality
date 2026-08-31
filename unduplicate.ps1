@@ -11,7 +11,7 @@ if (-Not (Test-Path $directoryPath)) {
 }
 
 # Get all files in the directory
-$files = Get-ChildItem -Path $directoryPath -File
+$files = Get-ChildItem -Path $directoryPath -File -Recurse
 
 # Group files by 'base name' and size
 $grouped = @{}
@@ -27,6 +27,7 @@ foreach ($file in $files) {
     $grouped[$key] += $file
 }
 
+$duplicateCount = 0
 foreach ($entry in $grouped.GetEnumerator()) {
     $fileGroup = $entry.Value
     if ($fileGroup.Count -gt 1) {
@@ -35,9 +36,10 @@ foreach ($entry in $grouped.GetEnumerator()) {
         $duplicates = $fileGroup | Where-Object { $_.BaseName -match '\(\d+\)$' }
 
         if ($duplicates.Count -gt 0) {
-            Write-Output "Original: $($original.Name)"
+            $duplicateCount = $duplicateCount + 1
+            Write-Output "Original: $($original.FullName)"
             foreach ($dup in $duplicates) {
-                Write-Output "Duplicate: $($dup.Name)"
+                Write-Output "Duplicate: $($dup.FullName)"
                 if ($deleteThese.IsPresent) {
                     Remove-Item $dup.FullName -Force
                     Write-Output "Deleted: $($dup.Name)"
@@ -45,5 +47,7 @@ foreach ($entry in $grouped.GetEnumerator()) {
             }
             Write-Output "----"
         }
+        
     }
 }
+Write-Output "Duplicate count: $($duplicateCount)"
